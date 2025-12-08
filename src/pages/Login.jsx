@@ -1,60 +1,86 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
+import api from "../api/client";
 
 function Login() {
+  const [form, setForm] = useState({ email: "", password: "" });
+  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
+
+  // Handle form changes
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  // Handle login submit
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setMessage("");
+
+    try {
+      const res = await api.post("/auth/login", form);
+
+      setMessage(`Login successful! Welcome ${res.data.user.name} 😍`);
+      console.log("User logged in:", res.data.user);
+
+      // 👉 Save token for future use
+      localStorage.setItem("token", res.data.token);
+
+      // 👉 Navigate to dashboard (later when you create it)
+      // navigate("/dashboard");
+
+    } catch (err) {
+      console.error("Login Error:", err);
+      setError(err.response?.data?.message || "Login failed. Try again.");
+    }
+  };
+
   return (
-    <section className="auth-section d-flex align-items-center py-5">
-      <div className="container">
-        <div className="row g-5 align-items-center justify-content-center">
+    <div className="container py-5" style={{ maxWidth: "500px" }}>
+      <h2 className="mb-4 text-center fw-bold">Login</h2>
 
-          <div className="col-md-6">
-            <div className="auth-card p-4 shadow-lg rounded-4">
-              <h3 className="fw-bold mb-3">Welcome Back 👋</h3>
-              <p className="text-muted mb-4">Login to continue your fitness journey.</p>
+      {/* Error Message */}
+      {error && <div className="alert alert-danger">{error}</div>}
 
-              <form className="row g-3">
-                <div className="col-12">
-                  <label className="form-label">Email</label>
-                  <input type="email" className="form-control" placeholder="you@example.com" />
-                </div>
+      {/* Success Message */}
+      {message && <div className="alert alert-success">{message}</div>}
 
-                <div className="col-12">
-                  <label className="form-label">Password</label>
-                  <input type="password" className="form-control" placeholder="••••••••" />
-                </div>
-
-                <div className="col-12">
-                  <button type="button" className="btn btn-accent w-100 py-2 rounded-pill">
-                    Login
-                  </button>
-                </div>
-              </form>
-
-              <div className="text-center mt-3">
-                <p className="small mb-0">
-                  Don't have an account?{" "}
-                  <Link to="/register" className="fw-semibold text-accent">
-                    Register here
-                  </Link>
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Image Section */}
-          <div className="col-md-5 d-none d-md-block">
-            <div className="auth-image-card floating-card">
-              <img
-                src="https://images.pexels.com/photos/1552252/pexels-photo-1552252.jpeg"
-                className="img-fluid rounded-4"
-                alt="fitness login"
-              />
-            </div>
-          </div>
-
+      <form onSubmit={handleSubmit} className="card p-4 shadow-sm border-0 rounded-4">
+        
+        {/* Email */}
+        <div className="mb-3">
+          <label className="form-label fw-semibold">Email</label>
+          <input
+            name="email"
+            type="email"
+            className="form-control form-control-lg"
+            value={form.email}
+            onChange={handleChange}
+            placeholder="Enter your email"
+            required
+          />
         </div>
-      </div>
-    </section>
+
+        {/* Password */}
+        <div className="mb-3">
+          <label className="form-label fw-semibold">Password</label>
+          <input
+            name="password"
+            type="password"
+            className="form-control form-control-lg"
+            value={form.password}
+            onChange={handleChange}
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        {/* Button */}
+        <button type="submit" className="btn btn-accent w-100 btn-lg">
+          Login
+        </button>
+      </form>
+    </div>
   );
 }
 
