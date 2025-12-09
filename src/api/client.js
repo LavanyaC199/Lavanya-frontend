@@ -2,8 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // example
+  baseURL: "https://lavanya-backend-m39n.onrender.com", // 👈 matches server.js
 });
 
 export default api;
-

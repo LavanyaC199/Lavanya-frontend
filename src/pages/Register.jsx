@@ -25,19 +25,29 @@ function Register() {
     setMessage("");
 
     try {
-      // backend expects: name, email, password, role
+      // Backend expects: firstName, lastName, email, password, role
       const payload = {
-        name: `${form.firstName} ${form.lastName}`.trim(),
+        firstName: form.firstName,
+        lastName: form.lastName,
         email: form.email,
         password: form.password,
         role: form.role,
       };
 
+      // If api baseURL = "http://localhost:5000/api"
       const res = await api.post("/auth/register", payload);
 
       setMessage(res.data.message || "Account created successfully!");
       console.log("Registered user:", res.data.user);
-      // later: navigate to /login or auto-login
+
+      // Optional: clear form
+      setForm({
+        firstName: "",
+        lastName: "",
+        email: "",
+        password: "",
+        role: "user",
+      });
     } catch (err) {
       console.error(err);
       setError(
